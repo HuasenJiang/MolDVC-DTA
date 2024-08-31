@@ -3,24 +3,6 @@
 A repo for "MolDVC-DTA: Molecular Structural Dual-View Learning with Contrastive Enhancement for Drug-Target Affinity Prediction".
 
 
-## Contents
-
-* [Abstracts](#abstracts)
-* [Requirements](#requirements)
-   * [Download projects](#download-projects)
-   * [Configure the environment manually](#configure-the-environment-manually)
-   * [Docker Image](#docker-image)
-* [Usages](#usages)
-   * [Project structure](#project-structure)
-   * [Data preparation](#data-preparation)
-   * [Training](#training)
-   * [Pretrained models](#pretrained-models)
-* [Results](#results)
-   * [Experimental results](#experimental-results)
-   * [Reproduce the results with single command](#reproduce-the-results-with-single-command)
-* [Baseline models](#baseline-models)
-* [NoteBooks](#notebooks)
-* [Contact](#contact)
 
 ## Abstracts
 
@@ -32,75 +14,33 @@ Drug-target affinity (DTA) prediction is crucial in drug discovery as it effecti
 
 * ### Download projects
 
-   Download the GitHub repo of this project onto your local server: `git clone https://github.com/bixiangpeng/HiSIF-DTA`
+   Download the GitHub repo of this project onto your local server: `https://github.com/HuasenJiang/MolDVC-DTA`
 
 
 * ### Configure the environment manually
 
-   Create and activate virtual env: `conda create -n HiSIF python=3.7 ` and `conda activate HiSIF`
-   
-   Install specified version of pytorch: ` conda install pytorch==1.8.0 torchvision==0.9.0 torchaudio==0.8.0 cudatoolkit=11.1 -c pytorch -c conda-forge`
-   
-   Install other python packages:
-   ```shell
-   pip install -r requirements.txt \
-   && pip install torch-scatter==2.0.6 -f https://pytorch-geometric.com/whl/torch-1.8.0+cu111.html \
-   && pip install torch-sparse==0.6.9 -f https://pytorch-geometric.com/whl/torch-1.8.0+cu111.html \
-   && pip install torch-spline-conv==1.2.1 -f https://pytorch-geometric.com/whl/torch-1.8.0+cu111.html
-   ```
+   Create and activate virtual env: `conda create -n MolDVC python=3.8 ` and `conda activate MolDVC`
+   Install specified version of pytorch: `conda install pytorch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 pytorch-cuda=11.8 -c pytorch -c nvidia`
+   torch-geometric == 2.4.0
+   torch-cluster == 1.6.1
+   torch-scatter == 2.1.1
+   torch-sparse == 0.6.17
+   torch-spline-conv == 1.2.2
+   rdkit == 2023.9.5
+   pandas == 2.0.3
+   scikit-learn == 1.3.2
    
    :bulb: Note that the operating system we used is `ubuntu 22.04` and the version of Anaconda is `23.3.1`.
 
-
-* ### Docker Image
-
-    We also provide the Dockerfile to build the environment, please refer to the Dockerfile for more details. Make sure you have Docker installed locally, and simply run following command:
-   ```shell
-   # Build the Docker image
-   sudo docker build --build-arg env_name=HiSIF -t hisif-image:v1 .
-   # Create and start the docker container
-   sudo docker run --name hisif-con --gpus all -it hisif-image:v1 /bin/bash
-   # Check whether the environment deployment is successful
-   conda list 
-   ```
   
 ##  Usages
 
-* ### Project structure
-
-   ```text
-       >  HiSIF-DTA
-          ├── baselines                       - Baseline models directory. All the baseline models we re-trained can be found in this directory.
-          ├── data                           - Data directory. The detailed information can be found in next section.
-          ├── models                          
-          │   ├── HGCN.py                    - Original model file, which includes both Top-Down (TDNet) and Bottom-Up(BUNet) semantic fusion models.
-          │   ├── HGCN_for_CPI.py            - A model modified for datasets (Human) with large numbers of proteins.
-          │   └── HGCN_for_Ablation.py       - Three ablation variants we used in this study.
-          ├── results                         - The reslut directory storing the experimental results and pre-trained models.
-          │   └── davis / kiba / Human      
-          │       ├── pretrained_BUNet.csv   - A CSV file recording the optimal predicting results of BUNet on davis/kiba/Human. 
-          │       ├── pretrained_BUNet.model - A file recording the optimal model parameters of BUNet on davis/kiba/Human.
-          │       ├── pretrained_TDNet.csv
-          │       └── pretrained_TDNet.model
-          ├── generate_contact_map.py         - A Python script used to generate the contact map based on PDB files.
-          ├── create_data.py                  - A python script used to convert original data to the input data that model needed.
-          ├── utils.py                        - A python script recording the various tools needed for training.
-          ├── training_for_DTA.py             - A python script used to train the model on DTA dataset (davis or kiba).
-          ├── training_for_CPI.py             - A python script used to train the model on CPI dataset (Human).
-          ├── test_for_DTA.py                 - A python script that reproduces the DTA prediction results using the pre-trained models.
-          ├── test_for_CPI.py                 - A python script that reproduces the CPI prediction results using the pre-trained models.
-          ├── test_for_Ablation.py            - A python script that reproduces the ablation results using the pre-trained models. 
-          ├── grad_pre.py                     - A python script using backpropagation gradients to predict protein binding pockets.
-          ├── requirements.txt                - A txt file recording the python packages that model depend on to run.
-          ├── Dockerfile                      - A file used to build the environment image via Docker.
-          └── experimental_results.ipynb      - A notebook indicating the prediction results of our models and other baseline models.
-   ```
 * ### Data preparation
   There are three benchmark datasets were adopted in this project, including two DTA datasets (`Davis and KIBA`) and a CPI dataset (`Human`).
 
    1. __Download processed data__
    
-      The data file (`data.zip`) of these three datasets can be downloaded from this [link](https://drive.google.com/file/d/13FzDDY1edFXRtJy7VEik8EZ2xMG5jbsk/view?usp=drive_link). Uncompress this file to get a 'data' folder containing all the original data and processed data.
+      The data file (`data.zip`) of these three datasets can be downloaded from this [link](https://pan.baidu.com/s/1VvKdQQzl1vbHcVw9URvxLA?pwd=1234 ). Uncompress this file to get a 'data' folder containing all the original data and processed data.
       
       🌳 Replacing the original 'data' folder by this new folder and then you can re-train or test our proposed model on Davis, KIBA or Human.  
       
@@ -116,26 +56,17 @@ Drug-target affinity (DTA) prediction is crucial in drug discovery as it effecti
           │   │   ├── test_fold_setting1.txt        - A txt file recording test set entry (Original)
           │   │   └── train_fold_setting1.txt       - A txt file recording training set entry (Original)
           │   ├── (davis/kiba)_dict.txt             - A txt file recording the corresponding Uniprot ID for every protein in datasets (processed)
-          │   ├── contact_map
-          │   │   └── (Uniprot ID).npy              - A npy file recording the corresponding contact map for every protein in datasets (processed)
-          │   ├── PPI
-          │   │   └── ppi_data.pkl                  - A pkl file recording the related PPI network data including adjacency matrix (dense),
-          │   │                                       feature matrix and the protein index in PPI (processed)
           │   ├── train.csv                         - Training set data in CSV format (processed)
           │   ├── test.csv                          - Test set data in CSV format (processed)
-          │   ├── mol_data.pkl                      - A pkl file recording drug graph data for all drugs in dataset (processed)
-          │   └── pro_data.pkl                      - A pkl file recording protein graph data for all proteins in dataset (processed)
+          │   ├── mol_data_M.pkl                      - A pkl file recording drug graph data for all drugs in dataset (processed)
+          │   └── pro_data_M.pkl                      - A pkl file recording protein graph data for all proteins in dataset (processed)
           └── Human                                 - CPI dataset directory.
-              ├── Human.txt                         - A txt file recording the information of drugs and proteins that interact (Original)
-              ├── contact_map
-              │   └── (XXXXX).npy
-              ├── PPI
-              │   └── ppi_data.pkl                   
+              ├── Human.txt                         - A txt file recording the information of drugs and proteins that interact (Original)              
               ├── Human_dict.txt
               ├── train(fold).csv                   - 5-fold training set data in CSV format (processed)
               ├── test(fold).csv                    - 5-fold test set data in CSV format (processed)
-              ├── mol_data.pkl
-              └── pro_data.pkl
+              ├── mol_data_M.pkl
+              └── pro_data_M.pkl
       ```
    3. __Customize your data__
 
@@ -153,16 +84,11 @@ Drug-target affinity (DTA) prediction is crucial in drug discovery as it effecti
          ```text
          >MKKFFDSRREQGGSGLGSGSSGGGGSTSGLGSGYIGRVFGIGRQQVTVDEVLAEGGFAIVFLVRTSNGMKCALKRMFVNNEHDLQVCKREIQIMRDLSGHKNIVGYIDSSINNVSSGDVWEVLILM...	Q2M2I8
          >PFWKILNPLLERGTYYYFMGQQPGKVLGDQRRPSLPALHFIKGAGKKESSRHGGPHCNVFVEHEALQRPVASDFEPQGLSEAARWNSKENLLAGPSENDPNLFVALYDFVASGDNTLSITKGEKLR...	P00519
-         ```
-      3. Download the corresponding protein structure file from the PDB（https://www.rcsb.org/） or Alphafold2(https://alphafold.com/) DB according to the Uniprot ID. Then you can get the contact map file by runing the following scripts:
-         ```python
-         python generate_contact_map.py --input_path '...data/your_dataset_name/your_pdb_dir/'  --output_path '...data/your_dataset_name/your_contact_map_dir/'  --chain_id 'A'
-         ``` 
-      4. Construct the graph data for drugs and proteins. Assume that you already have aboving files (1.2.3) in your `data/your_dataset_name/` folder, you can simply run following scripts:
+  
+      3. Construct the graph data for drugs and seq data proteins. Assume that you already have aboving files (1.2.3) in your `data/your_dataset_name/` folder, you can simply run following scripts:
          ```python
          python created_data.py --path '..data/'  --dataset 'your_dataset_name'  --output_path '..data/'
          ```
-      5. Finally, Upload the Uniprot IDs of all proteins in your dataset to the String DB(https://string-db.org/) for PPI networks data, and the feature descriptor of protein in PPI network we used can be available from Interpro (https://www.ebi.ac.uk/interpro/).
       
    :bulb: Note that the above is just a description of the general steps, and you may need to make some modification to the original script for different datasets.
      
@@ -172,13 +98,12 @@ Drug-target affinity (DTA) prediction is crucial in drug discovery as it effecti
   After processing the data, you can retrain the model from scratch with the following command:
   ```text
   
-  python training_for_DTA.py --model TDNet --epochs 2000 --batch 512 --LR 0.0005 --log_interval 20 --device 0 --dataset davis --num_workers 6 
+  python training_for_DTA.py  --epochs 2000 --batch 512 --LR 0.0005 --log_interval 20 --device 0 --dataset davis/kiba --num_workers 8
   or
-  python training_for_CPI.py --model BUNet --epochs 2000 --batch 512 --LR 0.0005 --log_interval 20 --device 0 --dataset kiba --num_workers 6 
+  python training_for_CPI.py  --epochs 2000 --batch 512 --LR 0.0005 --log_interval 20 --device 0 --dataset Human --num_workers 8
   ```
    Here is the detailed introduction of the optional parameters when running `training_for_DTA/CPI.py`:
      ```text
-      --model: The model name, specifying the name of the model to be used.There are two optional backbones, BUNet and TDNet.
       --epochs: The number of epochs, specifying the number of iterations for training the model on the entire dataset.
       --batch: The batch size, specifying the number of samples in each training batch.
       --LR: The learning rate, controlling the rate at which model parameters are updated.
@@ -190,25 +115,7 @@ Drug-target affinity (DTA) prediction is crucial in drug discovery as it effecti
    ```
    🌳 We provided an additional training file (`training_for_CPI.py`) specifically for conducting five-fold cross-training on the Human dataset.
   
-   🌳 Additionally, due to the larger scale of proteins in the Human dataset, we have made modifications to the original architecture to alleviate the memory requirements. For detailed changes, please refer to the file  `HGCN_for_CPI.py`.
 
-* ### Pretrained models
-   If you don't want to re-train the model, we provide pre-trained model parameters as shown below. 
-<a name="pretrained-models"></a>
-
-   | Datasets | Pre-trained models          | Description |
-   |:-----------:|:-----------------------------:|:--------------|
-   | Davis    | [BUNet](https://github.com/bixiangpeng/HiSIF-DTA/blob/main/results/davis/pretrained_BUNet.model) &nbsp; , &nbsp; [TDNet](https://github.com/bixiangpeng/HiSIF-DTA/blob/main/results/davis/pretrained_TDNet.model)       | The pretrained model parameters on the Davis. |
-   | KIBA     | [BUNet](https://github.com/bixiangpeng/HiSIF-DTA/blob/main/results/kiba/pretrained_BUNet.model) &nbsp; , &nbsp; [TDNet](https://github.com/bixiangpeng/HiSIF-DTA/blob/main/results/kiba/pretrained_TDNet.model)          | The Pretrained model parameters on the KIBA. |
-   | Human    | [BUNet](https://github.com/bixiangpeng/HiSIF-DTA/tree/main/results/Human) &nbsp; , &nbsp; [TDNet](https://github.com/bixiangpeng/HiSIF-DTA/tree/main/results/Human)          | The pretrained model parameters on the Human five-fold dataset. |
-  
-   Based on these pre-trained models, you can perform DTA predictions by simply running the following command:
-   ```text 
-   python test_for_DTA.py --model TDNet --dataset davis  or
-   python test_for_CPI.py --model BUNet --dataset Human
-   ```
-   :bulb: Note that before making predictions, in addition to placing the pre-trained model parameter files in the correct location, it is also necessary to place the required data files mentioned in the previous section in the appropriate location.
-  
 ## Results
 
 * ### Experimental results
