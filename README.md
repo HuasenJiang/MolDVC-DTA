@@ -9,7 +9,7 @@ A repo for "MolDVC-DTA: Molecular Structural Dual-View Learning with Contrastive
 
 Drug-target affinity (DTA) prediction is crucial in drug discovery as it effectively shortens the time and reduces the cost of drug development. In recent years, deep learning models based on drug topological graphs have been widely applied to DTA prediction tasks. However, these methods often rely on a singular atomic perspective and overlook the critical role of chemical bond information in drug molecules. Exploring rich and complete structural information of drugs and deeply mining molecular representations are key to improving DTA prediction accuracy. Therefore, we propose MolDVC-DTA, a dual-view contrastive-enhanced deep learning model based on molecular structure. This model utilizes a dual-view architecture to deeply integrate atomic and chemical bond topological information, providing a comprehensive and accurate description of drug molecules. In addition, we have developed a Multi-scale Representation Extraction and Contrastive Learning Enhancer to precisely identify key substructures of drug molecules and achieve feature reinforcement. Comprehensive experimental results demonstrate that MolDVC-DTA outperforms current state-of-the-art (SOTA) methods on benchmark datasets for DTA tasks. We further validated the generalization ability of MolDVC-DTA in classification tasks and demonstrated the interpretability of the method through visual analysis.
 
-![Uploading Figure_1.jpg…]()
+![Figure_1](https://github.com/user-attachments/assets/7253788d-fa2a-480e-8571-aa298d633433)
 
 
 ## Requirements
