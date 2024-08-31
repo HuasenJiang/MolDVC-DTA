@@ -1,1 +1,287 @@
 # MolDVC-DTA
+---
+A repo for "MolDVC-DTA: Molecular Structural Dual-View Learning with Contrastive Enhancement for Drug-Target Affinity Prediction".
+
+
+## Contents
+
+* [Abstracts](#abstracts)
+* [Requirements](#requirements)
+   * [Download projects](#download-projects)
+   * [Configure the environment manually](#configure-the-environment-manually)
+   * [Docker Image](#docker-image)
+* [Usages](#usages)
+   * [Project structure](#project-structure)
+   * [Data preparation](#data-preparation)
+   * [Training](#training)
+   * [Pretrained models](#pretrained-models)
+* [Results](#results)
+   * [Experimental results](#experimental-results)
+   * [Reproduce the results with single command](#reproduce-the-results-with-single-command)
+* [Baseline models](#baseline-models)
+* [NoteBooks](#notebooks)
+* [Contact](#contact)
+
+## Abstracts
+
+Drug-target affinity (DTA) prediction is crucial in drug discovery as it effectively shortens the time and reduces the cost of drug development. In recent years, deep learning models based on drug topological graphs have been widely applied to DTA prediction tasks. However, these methods often rely on a singular atomic perspective and overlook the critical role of chemical bond information in drug molecules. Exploring rich and complete structural information of drugs and deeply mining molecular representations are key to improving DTA prediction accuracy. Therefore, we propose MolDVC-DTA, a dual-view contrastive-enhanced deep learning model based on molecular structure. This model utilizes a dual-view architecture to deeply integrate atomic and chemical bond topological information, providing a comprehensive and accurate description of drug molecules. In addition, we have developed a Multi-scale Representation Extraction and Contrastive Learning Enhancer to precisely identify key substructures of drug molecules and achieve feature reinforcement. Comprehensive experimental results demonstrate that MolDVC-DTA outperforms current state-of-the-art (SOTA) methods on benchmark datasets for DTA tasks. We further validated the generalization ability of MolDVC-DTA in classification tasks and demonstrated the interpretability of the method through visual analysis.
+
+
+
+## Requirements
+
+* ### Download projects
+
+   Download the GitHub repo of this project onto your local server: `git clone https://github.com/bixiangpeng/HiSIF-DTA`
+
+
+* ### Configure the environment manually
+
+   Create and activate virtual env: `conda create -n HiSIF python=3.7 ` and `conda activate HiSIF`
+   
+   Install specified version of pytorch: ` conda install pytorch==1.8.0 torchvision==0.9.0 torchaudio==0.8.0 cudatoolkit=11.1 -c pytorch -c conda-forge`
+   
+   Install other python packages:
+   ```shell
+   pip install -r requirements.txt \
+   && pip install torch-scatter==2.0.6 -f https://pytorch-geometric.com/whl/torch-1.8.0+cu111.html \
+   && pip install torch-sparse==0.6.9 -f https://pytorch-geometric.com/whl/torch-1.8.0+cu111.html \
+   && pip install torch-spline-conv==1.2.1 -f https://pytorch-geometric.com/whl/torch-1.8.0+cu111.html
+   ```
+   
+   :bulb: Note that the operating system we used is `ubuntu 22.04` and the version of Anaconda is `23.3.1`.
+
+
+* ### Docker Image
+
+    We also provide the Dockerfile to build the environment, please refer to the Dockerfile for more details. Make sure you have Docker installed locally, and simply run following command:
+   ```shell
+   # Build the Docker image
+   sudo docker build --build-arg env_name=HiSIF -t hisif-image:v1 .
+   # Create and start the docker container
+   sudo docker run --name hisif-con --gpus all -it hisif-image:v1 /bin/bash
+   # Check whether the environment deployment is successful
+   conda list 
+   ```
+  
+##  Usages
+
+* ### Project structure
+
+   ```text
+       >  HiSIF-DTA
+          ├── baselines                       - Baseline models directory. All the baseline models we re-trained can be found in this directory.
+          ├── data                           - Data directory. The detailed information can be found in next section.
+          ├── models                          
+          │   ├── HGCN.py                    - Original model file, which includes both Top-Down (TDNet) and Bottom-Up(BUNet) semantic fusion models.
+          │   ├── HGCN_for_CPI.py            - A model modified for datasets (Human) with large numbers of proteins.
+          │   └── HGCN_for_Ablation.py       - Three ablation variants we used in this study.
+          ├── results                         - The reslut directory storing the experimental results and pre-trained models.
+          │   └── davis / kiba / Human      
+          │       ├── pretrained_BUNet.csv   - A CSV file recording the optimal predicting results of BUNet on davis/kiba/Human. 
+          │       ├── pretrained_BUNet.model - A file recording the optimal model parameters of BUNet on davis/kiba/Human.
+          │       ├── pretrained_TDNet.csv
+          │       └── pretrained_TDNet.model
+          ├── generate_contact_map.py         - A Python script used to generate the contact map based on PDB files.
+          ├── create_data.py                  - A python script used to convert original data to the input data that model needed.
+          ├── utils.py                        - A python script recording the various tools needed for training.
+          ├── training_for_DTA.py             - A python script used to train the model on DTA dataset (davis or kiba).
+          ├── training_for_CPI.py             - A python script used to train the model on CPI dataset (Human).
+          ├── test_for_DTA.py                 - A python script that reproduces the DTA prediction results using the pre-trained models.
+          ├── test_for_CPI.py                 - A python script that reproduces the CPI prediction results using the pre-trained models.
+          ├── test_for_Ablation.py            - A python script that reproduces the ablation results using the pre-trained models. 
+          ├── grad_pre.py                     - A python script using backpropagation gradients to predict protein binding pockets.
+          ├── requirements.txt                - A txt file recording the python packages that model depend on to run.
+          ├── Dockerfile                      - A file used to build the environment image via Docker.
+          └── experimental_results.ipynb      - A notebook indicating the prediction results of our models and other baseline models.
+   ```
+* ### Data preparation
+  There are three benchmark datasets were adopted in this project, including two DTA datasets (`Davis and KIBA`) and a CPI dataset (`Human`).
+
+   1. __Download processed data__
+   
+      The data file (`data.zip`) of these three datasets can be downloaded from this [link](https://drive.google.com/file/d/13FzDDY1edFXRtJy7VEik8EZ2xMG5jbsk/view?usp=drive_link). Uncompress this file to get a 'data' folder containing all the original data and processed data.
+      
+      🌳 Replacing the original 'data' folder by this new folder and then you can re-train or test our proposed model on Davis, KIBA or Human.  
+      
+      🌳 For clarity, the file architecture of `data` directory is described as follows:
+      
+      ```text
+       >  data
+          ├── davis / kiba                          - DTA dataset directory.
+          │   ├── ligands_can.txt                   - A txt file recording ligands information (Original)
+          │   ├── proteins.txt                      - A txt file recording proteins information (Original)
+          │   ├── Y                                 - A file recording binding affinity score (Original)
+          │   ├── folds                         
+          │   │   ├── test_fold_setting1.txt        - A txt file recording test set entry (Original)
+          │   │   └── train_fold_setting1.txt       - A txt file recording training set entry (Original)
+          │   ├── (davis/kiba)_dict.txt             - A txt file recording the corresponding Uniprot ID for every protein in datasets (processed)
+          │   ├── contact_map
+          │   │   └── (Uniprot ID).npy              - A npy file recording the corresponding contact map for every protein in datasets (processed)
+          │   ├── PPI
+          │   │   └── ppi_data.pkl                  - A pkl file recording the related PPI network data including adjacency matrix (dense),
+          │   │                                       feature matrix and the protein index in PPI (processed)
+          │   ├── train.csv                         - Training set data in CSV format (processed)
+          │   ├── test.csv                          - Test set data in CSV format (processed)
+          │   ├── mol_data.pkl                      - A pkl file recording drug graph data for all drugs in dataset (processed)
+          │   └── pro_data.pkl                      - A pkl file recording protein graph data for all proteins in dataset (processed)
+          └── Human                                 - CPI dataset directory.
+              ├── Human.txt                         - A txt file recording the information of drugs and proteins that interact (Original)
+              ├── contact_map
+              │   └── (XXXXX).npy
+              ├── PPI
+              │   └── ppi_data.pkl                   
+              ├── Human_dict.txt
+              ├── train(fold).csv                   - 5-fold training set data in CSV format (processed)
+              ├── test(fold).csv                    - 5-fold test set data in CSV format (processed)
+              ├── mol_data.pkl
+              └── pro_data.pkl
+      ```
+   3. __Customize your data__
+
+      You might like to test the model on more DTA or CPI datasets. If this is the case, please add your data in the folder 'data' and process them to be suitable for our model. We provide a detailed processing script for converting original data to the input data that our model needed, i.e., `create_data.py`. The processing steps are as follows:
+     
+      1. Split the raw dataset into training and test sets, and convert them into CSV format respectively（i.e., `train.csv` and `test.csv`）.
+         The content of the csv file can be organized as follows:
+         ```text
+                   compound_iso_smiles                                 target_sequence                                       affinity
+         C#Cc1cccc(Nc2ncnc3cc(OCCOC)c(OCCOC)cc23)c1          MAAVILESIFLKRSQQKKKTSPLNFKKRLFLLTVHKLSY                        5.568636236
+                                                             YEYDFERGRRGSKKGSIDVEKITCVETVVPEKNPPPERQ
+                                                             IPRRGEESSEMEQISIIERFPYPFQVVYDEGP
+         ```
+      2. Collect the Uniprot ID of all proteins in dataset from Uniprot DB(https://www.uniprot.org/) and record it as a txt file, such as `davis_dict.txt`:
+         ```text
+         >MKKFFDSRREQGGSGLGSGSSGGGGSTSGLGSGYIGRVFGIGRQQVTVDEVLAEGGFAIVFLVRTSNGMKCALKRMFVNNEHDLQVCKREIQIMRDLSGHKNIVGYIDSSINNVSSGDVWEVLILM...	Q2M2I8
+         >PFWKILNPLLERGTYYYFMGQQPGKVLGDQRRPSLPALHFIKGAGKKESSRHGGPHCNVFVEHEALQRPVASDFEPQGLSEAARWNSKENLLAGPSENDPNLFVALYDFVASGDNTLSITKGEKLR...	P00519
+         ```
+      3. Download the corresponding protein structure file from the PDB（https://www.rcsb.org/） or Alphafold2(https://alphafold.com/) DB according to the Uniprot ID. Then you can get the contact map file by runing the following scripts:
+         ```python
+         python generate_contact_map.py --input_path '...data/your_dataset_name/your_pdb_dir/'  --output_path '...data/your_dataset_name/your_contact_map_dir/'  --chain_id 'A'
+         ``` 
+      4. Construct the graph data for drugs and proteins. Assume that you already have aboving files (1.2.3) in your `data/your_dataset_name/` folder, you can simply run following scripts:
+         ```python
+         python created_data.py --path '..data/'  --dataset 'your_dataset_name'  --output_path '..data/'
+         ```
+      5. Finally, Upload the Uniprot IDs of all proteins in your dataset to the String DB(https://string-db.org/) for PPI networks data, and the feature descriptor of protein in PPI network we used can be available from Interpro (https://www.ebi.ac.uk/interpro/).
+      
+   :bulb: Note that the above is just a description of the general steps, and you may need to make some modification to the original script for different datasets.
+     
+   :blush: Therefore，We have provided detailed comments on the functionality of each function in the script, hoping that it could be helpful for you.
+
+* ### Training
+  After processing the data, you can retrain the model from scratch with the following command:
+  ```text
+  
+  python training_for_DTA.py --model TDNet --epochs 2000 --batch 512 --LR 0.0005 --log_interval 20 --device 0 --dataset davis --num_workers 6 
+  or
+  python training_for_CPI.py --model BUNet --epochs 2000 --batch 512 --LR 0.0005 --log_interval 20 --device 0 --dataset kiba --num_workers 6 
+  ```
+   Here is the detailed introduction of the optional parameters when running `training_for_DTA/CPI.py`:
+     ```text
+      --model: The model name, specifying the name of the model to be used.There are two optional backbones, BUNet and TDNet.
+      --epochs: The number of epochs, specifying the number of iterations for training the model on the entire dataset.
+      --batch: The batch size, specifying the number of samples in each training batch.
+      --LR: The learning rate, controlling the rate at which model parameters are updated.
+      --log_interval: The log interval, specifying the time interval for printing logs during training.
+      --device: The device, specifying the GPU device number used for training.
+      --dataset: The dataset name, specifying the dataset used for model training.
+      --num_workers: This parameter is an optional value in the Dataloader, and when its value is greater than 0, it enables 
+       multiprocessing for data processing.
+   ```
+   🌳 We provided an additional training file (`training_for_CPI.py`) specifically for conducting five-fold cross-training on the Human dataset.
+  
+   🌳 Additionally, due to the larger scale of proteins in the Human dataset, we have made modifications to the original architecture to alleviate the memory requirements. For detailed changes, please refer to the file  `HGCN_for_CPI.py`.
+
+* ### Pretrained models
+   If you don't want to re-train the model, we provide pre-trained model parameters as shown below. 
+<a name="pretrained-models"></a>
+
+   | Datasets | Pre-trained models          | Description |
+   |:-----------:|:-----------------------------:|:--------------|
+   | Davis    | [BUNet](https://github.com/bixiangpeng/HiSIF-DTA/blob/main/results/davis/pretrained_BUNet.model) &nbsp; , &nbsp; [TDNet](https://github.com/bixiangpeng/HiSIF-DTA/blob/main/results/davis/pretrained_TDNet.model)       | The pretrained model parameters on the Davis. |
+   | KIBA     | [BUNet](https://github.com/bixiangpeng/HiSIF-DTA/blob/main/results/kiba/pretrained_BUNet.model) &nbsp; , &nbsp; [TDNet](https://github.com/bixiangpeng/HiSIF-DTA/blob/main/results/kiba/pretrained_TDNet.model)          | The Pretrained model parameters on the KIBA. |
+   | Human    | [BUNet](https://github.com/bixiangpeng/HiSIF-DTA/tree/main/results/Human) &nbsp; , &nbsp; [TDNet](https://github.com/bixiangpeng/HiSIF-DTA/tree/main/results/Human)          | The pretrained model parameters on the Human five-fold dataset. |
+  
+   Based on these pre-trained models, you can perform DTA predictions by simply running the following command:
+   ```text 
+   python test_for_DTA.py --model TDNet --dataset davis  or
+   python test_for_CPI.py --model BUNet --dataset Human
+   ```
+   :bulb: Note that before making predictions, in addition to placing the pre-trained model parameter files in the correct location, it is also necessary to place the required data files mentioned in the previous section in the appropriate location.
+  
+## Results
+
+* ### Experimental results
+
+  We have designed a protein semantic information fusion framework based on the concept of hierarchical graph to enhance the richness of protein representation. Meanwhile, we propose two different strategies for semantic information fusion (_Top-Down_ and _Bottom-Up_) and evaluate their performance on different datasets. The performance of two different strategies on different datasets is as follows:
+
+  1. __Performance on the Davis dataset__
+     <a name="Experimental results on davis dataset"></a>
+  
+      | Backbone | MSE          | CI |
+      |:--------:|:---------:|:--------------:|
+      | __TDNet__ (Top-Down)    |  0.193 | 0.907  |
+      | __BUNet__ (Bottom-Up)   |  0.191 | 0.906 |
+
+  2. __Performance on the KIBA dataset__
+      <a name="Experimental results on kiba dataset"></a>
+        
+      | Backbone | MSE          | CI |
+      |:--------:|:---------:|:--------------:|
+      | __TDNet__ (Top-Down) |  0.120 | 0.904 |
+      | __BUNet__ (Bottom-Up)|  0.121 | 0.904 |
+
+  3. __Performance on the Human dataset__
+      <a name="Experimental results on kiba dataset"></a>
+     
+      | Backbone | AUROC     | Precision |  Recall |
+      |:--------:|:---------:|:--------------:|:-------:|
+      | __TDNet__ (Top-Down) |  0.988 | 0.945 | 0.952 |
+      | __BUNet__ (Bottom-Up)|  0.986 | 0.947 | 0.947|
+
+   🌳 The performance of baseline models can be found in `experimental_results.ipynb` or `baselines` directory.
+   
+* ### Reproduce the results with single command
+   To facilitate the reproducibility of our experimental results, we have provided a Docker Image-based solution that allows for reproducing our experimental results on multiple datasets with just a single command. You can easily experience this function with the following simple command：
+  ```text
+  sudo docker run --name hisif-con --gpus all --shm-size=2g -v /your/local/path/HiSIF-DTA/:/media/HiSIF-DTA -it hisif-image:v1
+
+  # docker run ：Create and start a new container based on the specified image.
+  # --name : It specifies the name ("hisif-con") for the container being created. You can use this name to reference and manage the container later.
+  # --gpus : It enables GPU support within the container and assigns all available GPUs to it. This allows the container to utilize the GPU resources for computation.
+  # -v : This is a parameter used to map local files to the container,and it is used in the following format: `-v /your/local/path/HiSIF-DTA:/mapped/container/path/HiSIF-DTA`
+  # -it : These options are combined and used to allocate a pseudo-TTY and enable interactive mode, allowing the user to interact with the container's command-line interface.
+  # hisif-image:v1 : It is a doker image, builded from Dockerfile. For detailed build instructions, please refer to the `Requirements` section.
+  ```
+  :bulb: Please note that the above one-click run is only applicable for the inference process and requires you to pre-place all the necessary processed data and pretrained models in the correct locations on your local machine. If you want to train the model in the created Docker container, please follow the instructions below:
+   ```text
+   1. sudo docker run --name hisif-con --gpus all --shm-size=16g -v /your/local/path/HiSIF-DTA/:/media/HiSIF-DTA -it hisif-image:v1 /bin/bash
+   2. cd /media/HiSIF-DTA
+   3. python training_for_DTA.py --dataset davis --model TDNet
+   ```
+## Baseline models
+
+To demonstrate the superiority of the proposed model, we conduct experiments to compare our approach with the following state-of-the-art (SOTA) models:
+
+**DTA:**
+- **DeepDTA** : [Repo Link ](https://github.com/hkmztrk/DeepDTA)
+- **AttentionDTA** : [Repo Link ](https://github.com/zhaoqichang/AttentionDTA_BIBM)
+- **GraphDTA** : [Repo Link ](https://github.com/thinng/GraphDTA)
+- **MGraphDTA** : [Repo Link ](https://github.com/guaguabujianle/MGraphDTA)
+- **DGraphDTA** : [Repo Link ](https://github.com/595693085/DGraphDTA)
+
+**CPI:**
+- **DrugVQA (seq)** : [Repo Link ](https://github.com/prokia/drugVQA)
+- **GraphDTA** : [Repo Link ](https://github.com/thinng/GraphDTA)
+- **CPI-GNN** : [Repo Link ](https://github.com/masashitsubaki/CPI_prediction)
+- **TransformerCPI** : [Repo Link ](https://github.com/lifanchen-simm/transformerCPI)
+
+🌳 The above link is the GitHub link to the baseline models. To ensure a fair comparison, we re-trained these baseline models with the same experimental setup as our proposed model. The detailed re-training codes and results can be found in the `baselines` directory.
+
+## NoteBooks
+
+To ensure the transparency of experimental results, the prediction results of all models (including our proposed model and baseline models) have been uploaded to Zenodo ([Link](https://zenodo.org/record/8385073)). Additionally, in order to present the experimental results in a more intuitive way, we provide a comprehensive Jupyter notebook in our repo ([`experimental_results.ipynb`](https://github.com/bixiangpeng/HiSIF-DTA/blob/main/experimental_results.ipynb)), where we load all prediction result files and recalculate the experimental metrics based on these results, presenting them in the form of statistical charts or tables.
+
+## Contact
+
+We welcome you to contact us (email: bixiangpeng@stu.ouc.edu.cn) for any questions and cooperations.
