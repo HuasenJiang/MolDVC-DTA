@@ -21,14 +21,23 @@ Drug-target affinity (DTA) prediction is crucial in drug discovery as it effecti
 
    Create and activate virtual env: `conda create -n MolDVC python=3.8 ` and `conda activate MolDVC`
    Install specified version of pytorch: `conda install pytorch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 pytorch-cuda=11.8 -c pytorch -c nvidia`
+  
    torch-geometric == 2.4.0
+  
    torch-cluster == 1.6.1
+  
    torch-scatter == 2.1.1
+  
    torch-sparse == 0.6.17
+  
    torch-spline-conv == 1.2.2
+  
    rdkit == 2023.9.5
+  
    pandas == 2.0.3
+  
    scikit-learn == 1.3.2
+  
    
    :bulb: Note that the operating system we used is `ubuntu 22.04` and the version of Anaconda is `23.3.1`.
 
