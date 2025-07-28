@@ -13,7 +13,9 @@
 
 
 * ### Configure the environment manually
+  
    GPU = NVIDIA GeForce RTX 4090 graphics card
+  
    Create and activate virtual env: `conda create -n MolDVC python=3.8 ` and `conda activate MolDVC`
    Install specified version of pytorch: `conda install pytorch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 pytorch-cuda=11.8 -c pytorch -c nvidia`
   
