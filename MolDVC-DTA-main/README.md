@@ -3,8 +3,6 @@
 
 
 
-![Figure_1](https://github.com/user-attachments/assets/7253788d-fa2a-480e-8571-aa298d633433)
-
 ## Requirements
 
 * ### Download projects
