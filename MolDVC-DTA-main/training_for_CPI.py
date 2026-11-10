@@ -110,7 +110,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch', type = int, default = 512)
     parser.add_argument('--LR', type = float, default = 0.0005)
     parser.add_argument('--device', type = int, default = 0)
-    parser.add_argument('--dataset', type = str, default = 'Human')
+    parser.add_argument('--dataset', type = str, default = 'Human',choices=['Human'])
     parser.add_argument('--num_workers', type= int, default = 8)
     args = parser.parse_args()
     main(args)

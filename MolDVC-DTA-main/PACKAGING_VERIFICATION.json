@@ -1,0 +1,77 @@
+{
+  "benchmark_data_validated": false,
+  "checkpoint_inference_executed": false,
+  "created_at_utc": "2026-11-10T09:39:00.017077+00:00",
+  "credential_pattern_findings": [],
+  "credential_scan_scope": "Pattern-based checks of explicitly packaged files; not a security certification",
+  "dependencies_installed_or_validated": false,
+  "documented_commands_parser_checked": [
+    "python training_for_DTA.py --dataset davis --device 0 --n_iter 4 --epochs 2000 --batch 1024 --LR 0.0005 --log_interval 20 --num_workers 8",
+    "python training_for_DTA.py --dataset kiba --device 0 --n_iter 4 --epochs 2000 --batch 1024 --LR 0.0005 --log_interval 20 --num_workers 8",
+    "python training_for_DTA_PDBbind.py --dataset PDBbind --device 0 --n_iter 4 --epochs 2000 --batch 512 --LR 0.0005 --log_interval 20 --num_workers 8",
+    "python training_for_DTA_LBA.py --dataset LBA30 --device 0 --n_iter 4 --epochs 2000 --batch 512 --LR 0.0001 --log_interval 20 --num_workers 8",
+    "python training_for_DTA_LBA.py --dataset LBA60 --device 0 --n_iter 4 --epochs 2000 --batch 512 --LR 0.0001 --log_interval 20 --num_workers 8",
+    "python training_for_CPI.py --dataset Human --device 0 --n_iter 4 --epochs 2000 --batch 512 --LR 0.0005 --num_workers 8"
+  ],
+  "evaluation_protocol_corrected": false,
+  "inherited_license_matches_existing_repository_blob": true,
+  "missing_local_dependencies": [],
+  "python_files_syntax_checked": 10,
+  "source_bytes_match_local_originals": true,
+  "source_files_compared": 11,
+  "training_executed": false,
+  "training_parser_flags": {
+    "training_for_CPI.py": [
+      "--Alpha",
+      "--Beta",
+      "--LR",
+      "--batch",
+      "--dataset",
+      "--device",
+      "--epochs",
+      "--n_iter",
+      "--num_workers"
+    ],
+    "training_for_DTA.py": [
+      "--Alpha",
+      "--Beta",
+      "--LR",
+      "--batch",
+      "--dataset",
+      "--device",
+      "--epochs",
+      "--log_interval",
+      "--n_iter",
+      "--num_workers",
+      "--window"
+    ],
+    "training_for_DTA_LBA.py": [
+      "--Alpha",
+      "--Beta",
+      "--LR",
+      "--batch",
+      "--dataset",
+      "--device",
+      "--epochs",
+      "--feature_dataset",
+      "--log_interval",
+      "--n_iter",
+      "--num_workers",
+      "--window"
+    ],
+    "training_for_DTA_PDBbind.py": [
+      "--Alpha",
+      "--Beta",
+      "--LR",
+      "--batch",
+      "--dataset",
+      "--device",
+      "--epochs",
+      "--log_interval",
+      "--n_iter",
+      "--num_workers",
+      "--window"
+    ]
+  },
+  "verification_level": "Static packaging checks only; no project imports executed"
+}

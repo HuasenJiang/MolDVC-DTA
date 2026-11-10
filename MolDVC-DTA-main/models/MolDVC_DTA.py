@@ -82,10 +82,11 @@ class NG_GCNConv(nn.Module):
         self.dropout = nn.Dropout(0.2)
 
     def forward(self, x,edge_index,batch):
+        gcn_out = x
         out_list = []
         gout_list = []
         for gcn_layer in self.gcn_layers:
-            gcn_out = gcn_layer(x, edge_index)
+            gcn_out = gcn_layer(gcn_out, edge_index)
             gcn_out = self.relu(gcn_out)
             gout = self.att(gcn_out, edge_index, batch)
             out_list.append(gcn_out)

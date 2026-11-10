@@ -22,6 +22,11 @@ def collate(data):
     data_batch = Batch.from_data_list(data,follow_batch=['edge_index'])
     return data_batch
 
+def collate1(data):
+    drug_batch = Batch.from_data_list( [item[0] for item in data], follow_batch=['edge_index'])
+    seq_batch = Batch.from_data_list([item[1] for item in data], follow_batch=['edge_index'])
+    return drug_batch,seq_batch
+
 def collate2(data):
     seq_batch = Batch.from_data_list([item for item in data])
     return seq_batch
@@ -58,6 +63,121 @@ class DTADataset(Dataset):
         GCNData = DATA.Data(x=drug_data.x, edge_index=drug_data.edge_index,edge_attr=drug_data.edge_attr,line_graph_edge_index=drug_data.line_graph_edge_index,seq_feat=pro_seq_feat,y=torch.FloatTensor([labels]))
         GCNData.__setitem__('c_size', torch.LongTensor([drug_data.c_size]))
         return GCNData
+
+class PDBDataset(Dataset):
+    def __init__(self, id_list, label_list, mol_data=None, pro_data=None):
+        super(PDBDataset,self).__init__()
+        self.id_list = id_list
+        self.label_list = label_list
+        self.ligand_graph = mol_data
+        self.pro_data = pro_data
+
+    def __len__(self):
+        return len(self.id_list)
+
+    def __getitem__(self, index):
+        # smile = self.smile_list[index]
+        # seq = self.seq_list[index]
+        id = self.id_list[index]
+        labels =self.label_list[index]
+
+        drug_data = self.ligand_graph[id]
+        _,pro_seq_feat = self.pro_data[id]
+
+        GCNData = DATA.Data(x=drug_data.x, edge_index=drug_data.edge_index,edge_attr=drug_data.edge_attr,line_graph_edge_index=drug_data.line_graph_edge_index,seq_feat=pro_seq_feat,y=torch.FloatTensor([labels]))
+        GCNData.__setitem__('c_size', torch.LongTensor([drug_data.c_size]))
+        return GCNData
+class GraphDTADataset(Dataset):
+    def __init__(self, smile_list, seq_list, label_list, mol_data=None, pro_data=None,ppi_index = None):
+        super(GraphDTADataset,self).__init__()
+        self.smile_list = smile_list
+        self.seq_list = seq_list
+        self.label_list = label_list
+        self.smile_graph = mol_data
+        self.ppi_index = ppi_index
+        self.pro_data = pro_data
+
+    def __len__(self):
+        return len(self.smile_list)
+
+    def __getitem__(self, index):
+        smile = self.smile_list[index]
+        seq = self.seq_list[index]
+        labels =self.label_list[index]
+
+
+        drug_data = self.smile_graph[smile]
+        seq_size = len(seq)
+        _,pro_x,pro_edge_index,pro_seq_feat = self.pro_data[seq]
+        seq_index =self.ppi_index[seq]
+
+        # Wrapping graph data into the Data format supported by PyG (PyTorch Geometric).
+        # GCNData_smile = DATA.Data(x=drug_data.x, edge_index=drug_data.edge_index,edge_attr=drug_data.edge_attr,line_graph_edge_index=drug_data.line_graph_edge_index,y=torch.FloatTensor([labels]),
+        #                           complete_edge_index=drug_data.complete_edge_index,degree=drug_data.degree,subgraph_edge_index=drug_data.subgraph_edge_index, num_subgraph_nodes=drug_data.num_subgraph_nodes, subgraph_node_index=drug_data.subgraph_node_idx, subgraph_indicator_index=drug_data.subgraph_indicator)
+        GCNData_smile = DATA.Data(x=drug_data.x, edge_index=drug_data.edge_index,edge_attr=drug_data.edge_attr,line_graph_edge_index=drug_data.line_graph_edge_index,y=torch.FloatTensor([labels]))
+        GCNData_smile.__setitem__('c_size', torch.LongTensor([drug_data.c_size]))
+        GCNData_seq = DATA.Data(x=pro_x,edge_index=pro_edge_index,seq_feat=pro_seq_feat,seq_num =torch.LongTensor([seq_index]),y=torch.FloatTensor([labels])) # The seq_index indicates the node number of the protein in the PPI graph.
+        GCNData_seq.__setitem__('c_size', torch.LongTensor([seq_size]))
+        return GCNData_smile, GCNData_seq
+
+class GraphPDBDTADataset(Dataset):
+    def __init__(self, id_list, label_list, mol_data=None, pro_data=None):
+        super(GraphPDBDTADataset,self).__init__()
+        self.id_list = id_list
+        self.label_list = label_list
+        self.ligand_graph = mol_data
+        self.pro_data = pro_data
+    def __len__(self):
+        return len(self.id_list)
+
+    def __getitem__(self, index):
+        id = self.id_list[index]
+        labels =self.label_list[index]
+        seq_size = len(id)
+        drug_data = self.ligand_graph[id]
+        _,pro_x,pro_edge_index,pro_seq_feat = self.pro_data[id]
+
+        # Wrapping graph data into the Data format supported by PyG (PyTorch Geometric).
+        # GCNData_smile = DATA.Data(x=drug_data.x, edge_index=drug_data.edge_index,edge_attr=drug_data.edge_attr,line_graph_edge_index=drug_data.line_graph_edge_index,y=torch.FloatTensor([labels]),
+        #                           complete_edge_index=drug_data.complete_edge_index,degree=drug_data.degree,subgraph_edge_index=drug_data.subgraph_edge_index, num_subgraph_nodes=drug_data.num_subgraph_nodes, subgraph_node_index=drug_data.subgraph_node_idx, subgraph_indicator_index=drug_data.subgraph_indicator)
+        GCNData_smile = DATA.Data(x=drug_data.x, edge_index=drug_data.edge_index,edge_attr=drug_data.edge_attr,line_graph_edge_index=drug_data.line_graph_edge_index,y=torch.FloatTensor([labels]))
+        GCNData_smile.__setitem__('c_size', torch.LongTensor([drug_data.c_size]))
+        GCNData_seq = DATA.Data(x=pro_x,edge_index=pro_edge_index,seq_feat=pro_seq_feat,y=torch.FloatTensor([labels])) # The seq_index indicates the node number of the protein in the PPI graph.
+        GCNData_seq.__setitem__('c_size', torch.LongTensor([seq_size]))
+        return GCNData_smile, GCNData_seq
+
+
+class BatchApprovedDTADataset(Dataset):
+    def __init__(self, drug_ids, pro_ids, labels, mol_data=None, pro_data=None):
+        super(BatchApprovedDTADataset, self).__init__()
+        self.drug_ids = drug_ids
+        self.pro_ids = pro_ids
+        self.labels = labels
+        self.ligand_graph = mol_data
+        self.pro_data = pro_data
+
+    def __len__(self):
+        return len(self.drug_ids)
+
+    def __getitem__(self, index):
+        drug_id = self.drug_ids[index]
+        pro_id = self.pro_ids[index]
+        label = self.labels[index]
+
+        drug_data = self.ligand_graph[drug_id]
+        _, pro_seq_feat = self.pro_data[pro_id]
+
+        GCNData = DATA.Data(
+            x=drug_data.x,
+            edge_index=drug_data.edge_index,
+            edge_attr=drug_data.edge_attr,
+            line_graph_edge_index=drug_data.line_graph_edge_index,
+            seq_feat=pro_seq_feat,
+            y=torch.FloatTensor([label])
+        )
+        GCNData.__setitem__('c_size', torch.LongTensor([drug_data.c_size]))
+        return GCNData
+
 
 class CPIDataset(Dataset):
     def __init__(self,smile_list, seq_list, label_list,mol_data = None,pro_data=None):
@@ -144,6 +264,15 @@ def proGraph(graph_data, index, device):
 def mse(y,f):
     mse = ((y - f)**2).mean(axis=0)
     return mse
+
+def rmse(y, f):
+    """计算均方根误差(RMSE)"""
+    return np.sqrt(((y - f)**2).mean(axis=0))
+
+# 您原有的MSE函数
+def mae(y, f):
+    """计算平均绝对误差(MAE)"""
+    return np.abs(y - f).mean(axis=0)
 
 def get_k(y_obs,y_pred):
     y_obs = np.array(y_obs)

@@ -1,124 +1,107 @@
-# MolDVC-DTA
----
+# MolDVC-DTA Training Source
 
+## Snapshot Scope
 
+This source-only snapshot was prepared on 2026-11-10 from the current local
+project. The four training entry points were explicitly identified by the author.
+Their source and the required local dependencies were copied without modifying
+their contents, including line endings. `SNAPSHOT_MANIFEST.json` records each
+original source file's SHA-256 checksum and size.
 
-## Requirements
+No training, checkpoint inference, dependency installation, or full reproduction
+was performed to prepare this snapshot. Read `KNOWN_LIMITATIONS.md` before using
+the scripts for a new evaluation. Data and pretrained weights must be obtained and
+verified separately; none are bundled in the dedicated source archive.
 
-* ### Download projects
+## Included Source
 
-   Download the GitHub repo of this project onto your local server: `https://github.com/HuasenJiang/MolDVC-DTA`
+| File | Role |
+| --- | --- |
+| `training_for_DTA.py` | Davis/KIBA affinity training; also contains a PDBbind dataset branch |
+| `training_for_DTA_LBA.py` | LBA30/LBA60 affinity training with feature-coverage checks |
+| `training_for_DTA_PDBbind.py` | Dedicated PDBbind affinity training |
+| `training_for_CPI.py` | Five-fold Human interaction classification |
+| `models/MolDVC_DTA.py` | Shared MolDVC-DTA model |
+| `models/contrastive_learning.py` | Branch contrastive objectives |
+| `utils.py` | Datasets, batching, and metrics |
+| `create_data_DTA.py` | Graph/sequence preprocessing and `CustomData` definition imported by the trainers |
+| `create_data_PDBbind.py` | Existing PDBbind preprocessing utilities |
+| `create_data_LBA.py` | Existing LBA split/feature preparation |
+| `requirements.txt` | Unmodified historical dependency list; not a complete environment lock |
 
+## Setup And Inputs
 
-* ### Configure the environment manually
-  
-   GPU = NVIDIA GeForce RTX 4090 graphics card
-  
-   Create and activate virtual env: `conda create -n MolDVC python=3.8 ` and `conda activate MolDVC`
-   Install specified version of pytorch: `conda install pytorch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 pytorch-cuda=11.8 -c pytorch -c nvidia`
-  
-   torch-geometric == 2.4.0
-  
-   torch-cluster == 1.6.1
-  
-   torch-scatter == 2.1.1
-  
-   torch-sparse == 0.6.17
-  
-   torch-spline-conv == 1.2.2
-  
-   rdkit == 2023.9.5
-  
-   pandas == 2.0.3
-  
-   scikit-learn == 1.3.2
-  
-   
-   :bulb: Note that the operating system we used is `ubuntu 22.04` and the version of Anaconda is `23.3.1`.
+Run commands from this directory, not from its parent repository directory:
 
-  
-##  Usages
+```bash
+cd MolDVC-DTA-main
+```
 
-* ### Data preparation
-  There are three benchmark datasets were adopted in this project, including two DTA datasets (`Davis and KIBA`) and a CPI dataset (`Human`).
+Consult `ENVIRONMENT.md` before installing dependencies. The included historical
+`requirements.txt` does not pin PyTorch itself and differs from the environment
+previously declared in the repository. No newly tested installation recipe is
+claimed here.
 
-   1. __Download processed data__
-   
-      The data file (`data.zip`) of these three datasets can be downloaded from this [link](https://pan.baidu.com/s/1VvKdQQzl1vbHcVw9URvxLA?pwd=1234 ). Uncompress this file to get a 'data' folder containing all the original data and processed data.
-      
-      🌳 Replacing the original 'data' folder by this new folder and then you can re-train or test our proposed model on Davis, KIBA or Human.  
-      
-      🌳 For clarity, the file architecture of `data` directory is described as follows:
-      
-      ```text
-       >  data
-          ├── davis / kiba                          - DTA dataset directory.
-          │   ├── ligands_can.txt                   - A txt file recording ligands information (Original)
-          │   ├── proteins.txt                      - A txt file recording proteins information (Original)
-          │   ├── Y                                 - A file recording binding affinity score (Original)
-          │   ├── folds                         
-          │   │   ├── test_fold_setting1.txt        - A txt file recording test set entry (Original)
-          │   │   └── train_fold_setting1.txt       - A txt file recording training set entry (Original)
-          │   ├── (davis/kiba)_dict.txt             - A txt file recording the corresponding Uniprot ID for every protein in datasets (processed)
-          │   ├── train.csv                         - Training set data in CSV format (processed)
-          │   ├── test.csv                          - Test set data in CSV format (processed)
-          │   ├── mol_data_M.pkl                      - A pkl file recording drug graph data for all drugs in dataset (processed)
-          │   └── pro_data_M.pkl                      - A pkl file recording protein graph data for all proteins in dataset (processed)
-          └── Human                                 - CPI dataset directory.
-              ├── Human.txt                         - A txt file recording the information of drugs and proteins that interact (Original)              
-              ├── Human_dict.txt
-              ├── train(fold).csv                   - 5-fold training set data in CSV format (processed)
-              ├── test(fold).csv                    - 5-fold test set data in CSV format (processed)
-              ├── mol_data_M.pkl
-              └── pro_data_M.pkl
-      ```
-   3. __Customize your data__
+Place the required CSV files and compatible `mol_data_M.pkl` / `pro_data_M.pkl`
+files under `data/<dataset>/` as specified in `DATA_LAYOUT.md`. Only load pickle
+files from trusted sources. Source packaging does not establish the provenance,
+coverage, or benchmark-version fidelity of separately obtained data.
 
-      You might like to test the model on more DTA or CPI datasets. If this is the case, please add your data in the folder 'data' and process them to be suitable for our model. We provide a detailed processing script for converting original data to the input data that our model needed, i.e., `create_data.py`. The processing steps are as follows:
-     
-      1. Split the raw dataset into training and test sets, and convert them into CSV format respectively（i.e., `train.csv` and `test.csv`）.
-         The content of the csv file can be organized as follows:
-         ```text
-                   compound_iso_smiles                                 target_sequence                                       affinity
-         C#Cc1cccc(Nc2ncnc3cc(OCCOC)c(OCCOC)cc23)c1          MAAVILESIFLKRSQQKKKTSPLNFKKRLFLLTVHKLSY                        5.568636236
-                                                             YEYDFERGRRGSKKGSIDVEKITCVETVVPEKNPPPERQ
-                                                             IPRRGEESSEMEQISIIERFPYPFQVVYDEGP
-         ```
-      2. Collect the Uniprot ID of all proteins in dataset from Uniprot DB(https://www.uniprot.org/) and record it as a txt file, such as `davis_dict.txt`:
-         ```text
-         >MKKFFDSRREQGGSGLGSGSSGGGGSTSGLGSGYIGRVFGIGRQQVTVDEVLAEGGFAIVFLVRTSNGMKCALKRMFVNNEHDLQVCKREIQIMRDLSGHKNIVGYIDSSINNVSSGDVWEVLILM...	Q2M2I8
-         >PFWKILNPLLERGTYYYFMGQQPGKVLGDQRRPSLPALHFIKGAGKKESSRHGGPHCNVFVEHEALQRPVASDFEPQGLSEAARWNSKENLLAGPSENDPNLFVALYDFVASGDNTLSITKGEKLR...	P00519
-  
-      3. Construct the graph data for drugs and seq data proteins. Assume that you already have aboving files (1.2.3) in your `data/your_dataset_name/` folder, you can simply run following scripts:
-         ```python
-         python created_data.py --path '..data/'  --dataset 'your_dataset_name'  --output_path '..data/'
-         ```
-      
-   :bulb: Note that the above is just a description of the general steps, and you may need to make some modification to the original script for different datasets.
-     
-   :blush: Therefore，We have provided detailed comments on the functionality of each function in the script, hoping that it could be helpful for you.
+## Training Commands
 
-* ### Training
-  After processing the data, you can retrain the model from scratch with the following command:
-  ```text
-  
-  python training_for_DTA.py  --epochs 2000 --batch 512 --LR 0.0005 --log_interval 20 --device 0 --dataset davis/kiba --num_workers 8
-  or
-  python training_for_CPI.py  --epochs 2000 --batch 512 --LR 0.0005 --log_interval 20 --device 0 --dataset Human --num_workers 8
-  ```
-   Here is the detailed introduction of the optional parameters when running `training_for_DTA/CPI.py`:
-     ```text
-      --epochs: The number of epochs, specifying the number of iterations for training the model on the entire dataset.
-      --batch: The batch size, specifying the number of samples in each training batch.
-      --LR: The learning rate, controlling the rate at which model parameters are updated.
-      --log_interval: The log interval, specifying the time interval for printing logs during training.
-      --device: The device, specifying the GPU device number used for training.
-      --dataset: The dataset name, specifying the dataset used for model training.
-      --num_workers: This parameter is an optional value in the Dataloader, and when its value is greater than 0, it enables 
-       multiprocessing for data processing.
-   ```
-   🌳 We provided an additional training file (`training_for_CPI.py`) specifically for conducting five-fold cross-training on the Human dataset.
-  
-## Contact
+The following commands use flags present in the packaged parsers. They were
+checked statically, not executed as training jobs. Select a valid GPU index or use
+the scripts' CPU fallback when CUDA is unavailable. Existing results with the
+same generated filenames may be overwritten when these commands are run.
 
-We welcome you to contact us (email: Jianghuasen@stu.ouc.edu.cn) for any questions and cooperations.
+Prepare output directories before running trainers that do not create them:
+
+```bash
+mkdir -p results/davis results/kiba results/PDBbind results/LBA30 results/LBA60 results/Human
+```
+
+```bash
+python training_for_DTA.py --dataset davis --device 0 --n_iter 4 --epochs 2000 --batch 1024 --LR 0.0005 --log_interval 20 --num_workers 8
+python training_for_DTA.py --dataset kiba --device 0 --n_iter 4 --epochs 2000 --batch 1024 --LR 0.0005 --log_interval 20 --num_workers 8
+python training_for_DTA_PDBbind.py --dataset PDBbind --device 0 --n_iter 4 --epochs 2000 --batch 512 --LR 0.0005 --log_interval 20 --num_workers 8
+python training_for_DTA_LBA.py --dataset LBA30 --device 0 --n_iter 4 --epochs 2000 --batch 512 --LR 0.0001 --log_interval 20 --num_workers 8
+python training_for_DTA_LBA.py --dataset LBA60 --device 0 --n_iter 4 --epochs 2000 --batch 512 --LR 0.0001 --log_interval 20 --num_workers 8
+python training_for_CPI.py --dataset Human --device 0 --n_iter 4 --epochs 2000 --batch 512 --LR 0.0005 --num_workers 8
+```
+
+`training_for_CPI.py` does not accept `--log_interval`. The regression entry points
+also accept `--Alpha`, `--Beta`, and `--window`; CPI accepts `--Alpha` and `--Beta`.
+LBA additionally accepts `--feature_dataset` to select a different feature-cache
+directory, provided its keys cover all required IDs. `--window` is used in result
+filenames; it is not passed to the model constructor in these regression scripts.
+
+These commands describe the supplied source behavior, not a claim that the exact
+commands or hyperparameters generated a particular manuscript table.
+
+## Preprocessing
+
+The existing preprocessing files are included for provenance and local imports;
+they are not a newly validated, fully portable raw-data pipeline.
+
+- `create_data_DTA.py` accepts `--dataset`, but its default execution does not
+  automatically construct every required split or auxiliary file.
+- `create_data_PDBbind.py` has a machine-specific path in its main block, not a
+  portable `--path` argument. Inspect the code before running it.
+- `create_data_LBA.py` accepts explicit raw-data and affinity-table paths. Its
+  default split list is `train test`; validation is not processed unless requested.
+  It can write/replace caches and filter generated CSVs. Do not run it against a
+  benchmark directory without first verifying the data version and preserving
+  the original split records.
+
+## Integrity And License
+
+From this directory, verify the listed snapshot files with:
+
+```bash
+sha256sum -c SHA256SUMS
+```
+
+`PACKAGING_VERIFICATION.json` distinguishes source and syntax checks from runtime
+or scientific validation. The inherited MIT license is retained as `LICENSE`;
+existing source attribution comments have not been removed. This license does
+not grant redistribution rights for separately obtained third-party datasets.
