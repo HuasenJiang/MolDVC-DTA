@@ -1,0 +1,335 @@
+{
+  "release_date": "2026-11-16",
+  "repository": "https://github.com/HuasenJiang/MolDVC-DTA",
+  "scope": "Processed features and the split CSVs consumed by the current default training entry points",
+  "datasets_included": [
+    "davis",
+    "kiba",
+    "Human"
+  ],
+  "datasets_excluded": [
+    "PDBbind",
+    "LBA30",
+    "LBA60"
+  ],
+  "exclusion_reason": "Author confirmed not to upload pending redistribution permission review",
+  "file_count": 20,
+  "feature_pickle_count": 6,
+  "split_csv_count": 14,
+  "total_bytes": 183141763,
+  "uncompressed_input_total_bytes": 226771669,
+  "preprocessing_training_or_inference_performed": false,
+  "pickle_deserialization_performed": false,
+  "files": [
+    {
+      "dataset": "davis",
+      "filename": "mol_data_M.pkl",
+      "source_relative_path": "data/davis/mol_data_M.pkl",
+      "repository_path": "MolDVC-DTA-main/data/davis/mol_data_M.pkl",
+      "bytes": 1070572,
+      "sha256": "88ed4e97c85443c649bad7080e2583dff45d485128e3e54706bb3a968aac6e23",
+      "git_blob_sha1": "4effe9f83041c78b3a9f14cb6b75166cda916016",
+      "original_bytes_preserved": true,
+      "kind": "feature_pickle"
+    },
+    {
+      "dataset": "davis",
+      "filename": "pro_data_M.pkl",
+      "source_relative_path": "data/davis/pro_data_M.pkl",
+      "repository_path": "MolDVC-DTA-main/data/davis/pro_data_M.pkl",
+      "bytes": 4036899,
+      "sha256": "db580f341cac3b7368c2f87ec104870fea040c948c9f5464059fa7be3561fac3",
+      "git_blob_sha1": "65b7398f604f9d7261849a4e767dbc037a0345b2",
+      "original_bytes_preserved": true,
+      "kind": "feature_pickle"
+    },
+    {
+      "dataset": "kiba",
+      "filename": "mol_data_M.pkl",
+      "source_relative_path": "data/kiba/mol_data_M.pkl",
+      "repository_path": "MolDVC-DTA-main/data/kiba/mol_data_M.pkl",
+      "bytes": 29485615,
+      "sha256": "7513fa1b3d18f1596a56522bf568e6dee05b35d279a65071806486b3621729df",
+      "git_blob_sha1": "60d180fb5df246d8c0ae835617da1907fc5f58e1",
+      "original_bytes_preserved": true,
+      "kind": "feature_pickle"
+    },
+    {
+      "dataset": "kiba",
+      "filename": "pro_data_M.pkl",
+      "source_relative_path": "data/kiba/pro_data_M.pkl",
+      "repository_path": "MolDVC-DTA-main/data/kiba/pro_data_M.pkl",
+      "bytes": 2435584,
+      "sha256": "4df85f17337003c6736ac4cb4b2575ec94d1536ad59e179d1fc46f75c31bacd3",
+      "git_blob_sha1": "7575b0927aa6a1beb3d0fb04438de33095afaab9",
+      "original_bytes_preserved": true,
+      "kind": "feature_pickle"
+    },
+    {
+      "dataset": "Human",
+      "filename": "mol_data_M.pkl",
+      "source_relative_path": "data/Human/mol_data_M.pkl",
+      "repository_path": "MolDVC-DTA-main/data/Human/mol_data_M.pkl",
+      "bytes": 30082370,
+      "sha256": "53e0dc2907056221ab646ce03bd78212d15ac2675a986e1e1f47c62dd091e624",
+      "git_blob_sha1": "ee844a0acecbc8376063ca70160a077051716076",
+      "original_bytes_preserved": true,
+      "kind": "feature_pickle"
+    },
+    {
+      "dataset": "Human",
+      "filename": "pro_data_M.pkl",
+      "source_relative_path": "data/Human/pro_data_M.pkl",
+      "repository_path": "MolDVC-DTA-main/data/Human/pro_data_M.pkl",
+      "bytes": 20378850,
+      "sha256": "b89fa078cc5ac1ce6753fdc6376d70e92fc4655a4fb612b93057a25e586f7392",
+      "git_blob_sha1": "5ccd58e213e84c78032f41b1dd55a5a418f15269",
+      "original_bytes_preserved": true,
+      "kind": "feature_pickle"
+    },
+    {
+      "dataset": "davis",
+      "filename": "train.csv",
+      "source_relative_path": "data/davis/train.csv",
+      "repository_path": "MolDVC-DTA-main/data/davis/train.csv",
+      "bytes": 21358808,
+      "sha256": "4bb474928e4118ecc9df5ae2c1fe03d72ac24de873277787a3b6736b88a8225f",
+      "git_blob_sha1": "a3bcbc51e0cf989af69b8928e6384f325724e140",
+      "original_bytes_preserved": true,
+      "kind": "split_csv",
+      "columns": [
+        "compound_iso_smiles",
+        "target_sequence",
+        "affinity"
+      ],
+      "rows": 25046
+    },
+    {
+      "dataset": "davis",
+      "filename": "test.csv",
+      "source_relative_path": "data/davis/test.csv",
+      "repository_path": "MolDVC-DTA-main/data/davis/test.csv",
+      "bytes": 4288922,
+      "sha256": "c0631a37f8148c4837389380c56887911454a6aa245700c339c58facf8b94de9",
+      "git_blob_sha1": "3c560d706a2c69b9179c512e5d892eff9cdb7c35",
+      "original_bytes_preserved": true,
+      "kind": "split_csv",
+      "columns": [
+        "compound_iso_smiles",
+        "target_sequence",
+        "affinity"
+      ],
+      "rows": 5010
+    },
+    {
+      "dataset": "kiba",
+      "filename": "train.csv.gz",
+      "source_relative_path": "data/kiba/train.csv",
+      "repository_path": "MolDVC-DTA-main/data/kiba/train.csv.gz",
+      "bytes": 34402690,
+      "sha256": "f7f3db9cbde1aeadcb19eaaab8db8fd81faa4ad57e3f1626923b341a794e10ef",
+      "git_blob_sha1": "b294cd4d80eb46bbea1ac387f0ec101c718b3c74",
+      "original_bytes_preserved": true,
+      "kind": "split_csv",
+      "columns": [
+        "compound_iso_smiles",
+        "target_sequence",
+        "affinity"
+      ],
+      "rows": 98545,
+      "source_bytes": 78032596,
+      "source_sha256": "41b9e38d32fa16d2d0d1bc646e0eb97ddb53d5c432ddbdcec9a917b127150679",
+      "source_git_blob_sha1": "fd42a5272819314fda47a5e4c8fbe9314b45e704",
+      "upload_source_relative_path": "github_feature_release_2026-11-16/staging/train.csv.gz",
+      "storage_encoding": "gzip; decompress to the original train.csv before training",
+      "decompression_sha256_verified": true
+    },
+    {
+      "dataset": "kiba",
+      "filename": "test.csv",
+      "source_relative_path": "data/kiba/test.csv",
+      "repository_path": "MolDVC-DTA-main/data/kiba/test.csv",
+      "bytes": 15659753,
+      "sha256": "b3af7b935fab5af619e08a7d8e310def7812c34bcedae7e2750c493de791830f",
+      "git_blob_sha1": "b368afbad0ff84ce28e618c98b410853d4ee812d",
+      "original_bytes_preserved": true,
+      "kind": "split_csv",
+      "columns": [
+        "compound_iso_smiles",
+        "target_sequence",
+        "affinity"
+      ],
+      "rows": 19709
+    },
+    {
+      "dataset": "Human",
+      "filename": "train1.csv",
+      "source_relative_path": "data/Human/train1.csv",
+      "repository_path": "MolDVC-DTA-main/data/Human/train1.csv",
+      "bytes": 3153465,
+      "sha256": "743807dd18acfdf4f3fed1a1cdd2d541521ae7166cd96d1434ac6d9a3b8c9c93",
+      "git_blob_sha1": "f9774b687e791e35d21a79f5ef16087cb0289db5",
+      "original_bytes_preserved": true,
+      "kind": "split_csv",
+      "columns": [
+        "compound_iso_smiles",
+        "target_sequence",
+        "affinity"
+      ],
+      "rows": 4657
+    },
+    {
+      "dataset": "Human",
+      "filename": "train2.csv",
+      "source_relative_path": "data/Human/train2.csv",
+      "repository_path": "MolDVC-DTA-main/data/Human/train2.csv",
+      "bytes": 3191412,
+      "sha256": "59450b9b9f3503033845ec0a0498fd9aabf2be078482ae28bc695ce206cd45e1",
+      "git_blob_sha1": "92c70e5083314d543607d1fab7ccf6e1e8cb8a8d",
+      "original_bytes_preserved": true,
+      "kind": "split_csv",
+      "columns": [
+        "compound_iso_smiles",
+        "target_sequence",
+        "affinity"
+      ],
+      "rows": 4657
+    },
+    {
+      "dataset": "Human",
+      "filename": "train3.csv",
+      "source_relative_path": "data/Human/train3.csv",
+      "repository_path": "MolDVC-DTA-main/data/Human/train3.csv",
+      "bytes": 3219595,
+      "sha256": "9c23b69da581cb9b55c3557b098c89e6c10a0815d51df9b57c228a05d30dd90c",
+      "git_blob_sha1": "b689cba156da089ee6267f74df3cc9083efcfed9",
+      "original_bytes_preserved": true,
+      "kind": "split_csv",
+      "columns": [
+        "compound_iso_smiles",
+        "target_sequence",
+        "affinity"
+      ],
+      "rows": 4657
+    },
+    {
+      "dataset": "Human",
+      "filename": "train4.csv",
+      "source_relative_path": "data/Human/train4.csv",
+      "repository_path": "MolDVC-DTA-main/data/Human/train4.csv",
+      "bytes": 3197015,
+      "sha256": "1c69b4d63821f1f7f68baccc775cd8395f7b69fb9f93edc4b258df88946be484",
+      "git_blob_sha1": "fac2c8c8f2854e1eedfa877168aa008180534c17",
+      "original_bytes_preserved": true,
+      "kind": "split_csv",
+      "columns": [
+        "compound_iso_smiles",
+        "target_sequence",
+        "affinity"
+      ],
+      "rows": 4657
+    },
+    {
+      "dataset": "Human",
+      "filename": "train5.csv",
+      "source_relative_path": "data/Human/train5.csv",
+      "repository_path": "MolDVC-DTA-main/data/Human/train5.csv",
+      "bytes": 3191738,
+      "sha256": "df283f1163354f4ccade53fa8c85489adf072687b7f2790686336134095039d7",
+      "git_blob_sha1": "430c69486a124c0f4ed31ead47697d15934f7e57",
+      "original_bytes_preserved": true,
+      "kind": "split_csv",
+      "columns": [
+        "compound_iso_smiles",
+        "target_sequence",
+        "affinity"
+      ],
+      "rows": 4656
+    },
+    {
+      "dataset": "Human",
+      "filename": "test1.csv",
+      "source_relative_path": "data/Human/test1.csv",
+      "repository_path": "MolDVC-DTA-main/data/Human/test1.csv",
+      "bytes": 834875,
+      "sha256": "af5f925d079034f3e4eb042a555844f388aaa44ab5d419fdc6394aaf634d06a2",
+      "git_blob_sha1": "37904c7fffb827ad2ea1df88d596b5648fe09adb",
+      "original_bytes_preserved": true,
+      "kind": "split_csv",
+      "columns": [
+        "compound_iso_smiles",
+        "target_sequence",
+        "affinity"
+      ],
+      "rows": 1164
+    },
+    {
+      "dataset": "Human",
+      "filename": "test2.csv",
+      "source_relative_path": "data/Human/test2.csv",
+      "repository_path": "MolDVC-DTA-main/data/Human/test2.csv",
+      "bytes": 796928,
+      "sha256": "b95b50c99d2c4f9f2676c7f3617090bb3bf6a7fdd693a0be0d950968736e9889",
+      "git_blob_sha1": "6f55c2cd9b22a84d6d8eb1aea5b564ebe728bb25",
+      "original_bytes_preserved": true,
+      "kind": "split_csv",
+      "columns": [
+        "compound_iso_smiles",
+        "target_sequence",
+        "affinity"
+      ],
+      "rows": 1164
+    },
+    {
+      "dataset": "Human",
+      "filename": "test3.csv",
+      "source_relative_path": "data/Human/test3.csv",
+      "repository_path": "MolDVC-DTA-main/data/Human/test3.csv",
+      "bytes": 768745,
+      "sha256": "5a84fba47af9920d149191c197fae5ae14395f994031ae303879326e96dbf025",
+      "git_blob_sha1": "f5f6001f4657531b3b4a140137d53e18e34f4840",
+      "original_bytes_preserved": true,
+      "kind": "split_csv",
+      "columns": [
+        "compound_iso_smiles",
+        "target_sequence",
+        "affinity"
+      ],
+      "rows": 1164
+    },
+    {
+      "dataset": "Human",
+      "filename": "test4.csv",
+      "source_relative_path": "data/Human/test4.csv",
+      "repository_path": "MolDVC-DTA-main/data/Human/test4.csv",
+      "bytes": 791325,
+      "sha256": "d0a99b8aa3bab83cefca2cd4fea8fb98a1981f527a89d6513a5a91435e383f59",
+      "git_blob_sha1": "6ebe47decdbe8a2657b132d1091cf61caa42d9d8",
+      "original_bytes_preserved": true,
+      "kind": "split_csv",
+      "columns": [
+        "compound_iso_smiles",
+        "target_sequence",
+        "affinity"
+      ],
+      "rows": 1164
+    },
+    {
+      "dataset": "Human",
+      "filename": "test5.csv",
+      "source_relative_path": "data/Human/test5.csv",
+      "repository_path": "MolDVC-DTA-main/data/Human/test5.csv",
+      "bytes": 796602,
+      "sha256": "10e175779ff7a896a7f6dbadd1c35e171c15a92a487b711dec150fedc643ee24",
+      "git_blob_sha1": "b67be57317cda8fda1b50b680db6a0f380d8dc35",
+      "original_bytes_preserved": true,
+      "kind": "split_csv",
+      "columns": [
+        "compound_iso_smiles",
+        "target_sequence",
+        "affinity"
+      ],
+      "rows": 1165
+    }
+  ]
+}
