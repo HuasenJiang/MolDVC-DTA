@@ -17,12 +17,50 @@ See the [current training instructions](MolDVC-DTA-main/README.md),
 The snapshot preserves the selected local source files byte for byte; it is not a
 new training run or a claim that all manuscript results have been reproduced.
 Dataset files, feature caches, and model weights are not included in the dedicated
-source ZIP. Existing repository weights are retained separately, without a new
-compatibility claim.
+source ZIP. The author-designated Davis checkpoint is distributed separately
+as described below. No KIBA checkpoint is distributed in the current branch.
 
 On GitHub, the dedicated source archive is in [`code_snapshots/`](code_snapshots/).
 The snapshot manifest, verification report, and SHA-256 checksums are under
 `MolDVC-DTA-main/`. The existing [MIT license](MolDVC-DTA-main/LICENSE) is retained.
+
+## Pretrained Davis Checkpoint
+
+The author-designated Davis checkpoint is available as
+[`MolDVC_DTA_davis`](MolDVC-DTA-main/results/davis/MolDVC_DTA_davis)
+(with no filename extension). It was trained with `training_for_DTA.py` and
+replaces the previously published Davis file. The old KIBA checkpoint has been
+removed from the current branch.
+
+The published file is an unchanged copy of the author-selected checkpoint,
+renamed only for distribution. It contains a PyTorch model state dictionary.
+
+- Size: 9,732,027 bytes.
+- SHA-256: `bd913fe7d3fc26502085d56bfdf8e2c1d5f87de5057660b0943b689d5de7c651`.
+
+The metrics supplied by the author for this individual checkpoint are:
+
+| MSE | RMSE | MAE | CI | r_m^2 |
+| --- | --- | --- | --- | --- |
+| 0.20485835 | 0.4526128 | 0.22435944 | 0.901940030627468 | 0.7208173259653013 |
+
+These values describe one checkpoint, not a five-seed mean. Publication checks
+confirmed file integrity and strict state-dictionary loading into the current
+four-layer MolDVC-DTA architecture on CPU, with no missing or unexpected keys.
+No training or benchmark inference was performed as part of this upload.
+
+From `MolDVC-DTA-main/`, load the trusted checkpoint into an instantiated,
+matching model using:
+
+```python
+state = torch.load("results/davis/MolDVC_DTA_davis",
+                   map_location="cpu", weights_only=True)
+model.load_state_dict(state, strict=True)
+```
+
+The existing `test_for_DTA.py` has a legacy hard-coded checkpoint path and is
+unchanged in this update. Its old path should not be used as the download
+location for the newly published model.
 
 ## Data Availability
 
